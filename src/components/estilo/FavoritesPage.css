@@ -1,0 +1,23 @@
+.favorites-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.favorites-header {
+  text-align: center;
+  padding: 1rem 0 0.5rem;
+}
+
+.favorites-header__title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.favorites-header__subtitle {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #64748b;
+}

@@ -1,0 +1,55 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.home-hero {
+  text-align: center;
+  padding: 1rem 0 0.5rem;
+}
+
+.home-hero__title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.home-hero__accent {
+  color: #16a34a;
+}
+
+.home-hero__subtitle {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #64748b;
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.home-matches__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.home-matches__filter-label {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #16a34a;
+}
+
+@media (max-width: 640px) {
+  .home-hero__title {
+    font-size: 1.75rem;
+  }
+}

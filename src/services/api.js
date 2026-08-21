@@ -31,14 +31,13 @@ function normalizeEvent(ev, leagueCode) {
 
   return {
     id: ev.id,
-    leagueCode,
-    league: leagueName(leagueCode),
+    leagueCode: match.leagueCode,
     date: ev.date || comp?.date || comp?.startDate || null,
     venue: comp?.venue?.fullName || comp?.venue?.displayName || null,
     status: {
-      state: statusType.state, // 'pre' | 'in' | 'post'
+      state: statusType.state,
       completed: statusType.completed,
-      detail: statusType.shortDetail, // "FT", "45'", "20:00"
+      detail: statusType.shortDetail,
       clock: comp?.status?.displayClock,
     },
     home: {
@@ -85,33 +84,102 @@ export async function getFixtureDetail(leagueCode, id) {
   const headerEvent = data.header || {};
   const match = normalizeEvent(headerEvent, leagueCode);
 
-  const events = (data.keyEvents || []).map((ev, idx) => {
-    const typeText = ev.type?.text || ev.text || "";
-    const involvedNames = (ev.athletesInvolved || [])
-      .map((a) => a.displayName)
-      .filter(Boolean);
-    const isSubstitution = /sub/i.test(typeText);
+  const events = (data.keyEvents || [])
+    .map((ev, idx) => {
+      const typeText = ev.type?.text || "";
+      const text = ev.text || "";
+      const shortText = ev.shortText || "";
 
-    return {
-      id: ev.id || idx,
-      minute: ev.clock?.displayValue || ev.time?.displayValue || "",
-      typeText,
-      teamId: ev.team?.id || null,
-      player: involvedNames[0] || ev.athlete?.displayName || "",
-      subInPlayer: isSubstitution ? involvedNames[1] || involvedNames[0] || "" : null,
-      isSubstitution,
-    };
-  });
+      const combinedText = `${typeText} ${text} ${shortText}`.toLowerCase();
+
+      if (
+        combinedText.includes("delay in match") ||
+        combinedText.includes("delay over") ||
+        combinedText.includes("start delay") ||
+        combinedText.includes("end delay")
+      ) {
+        return null;
+      }
+
+      const isSubstitution = combinedText.includes("substitution");
+
+      const isGoal =
+        ev.scoringPlay === true ||
+        combinedText.includes("goal!");
+
+      let player = "";
+      let playerOut = "";
+      let playerIn = "";
+
+      if (isGoal) {
+        player = shortText
+          .replace(/\s*Goal\s*$/i, "")
+          .trim();
+
+        if (!player) {
+          const goalMatch = text.match(
+            /^Goal!.*?\.\s*([^()]+?)\s*\(/i
+          );
+
+          player = goalMatch?.[1]?.trim() || "";
+        }
+      }
+
+      if (isSubstitution) {
+        playerIn = shortText
+          .replace(/\s*Substitution\s*$/i, "")
+          .trim();
+
+        const replacesMatch = text.match(
+          /replaces\s+(.+?)(?:\s+because\b|\.)/i
+        );
+
+        if (replacesMatch) {
+          playerOut = replacesMatch[1].trim();
+        }
+
+        if (!playerOut) {
+          const fallbackMatch = text.match(
+            /replaces\s+(.+)$/i
+          );
+
+          if (fallbackMatch) {
+            playerOut = fallbackMatch[1]
+              .replace(/\s+because.*$/i, "")
+              .replace(/\.$/, "")
+              .trim();
+          }
+        }
+      }
+
+      return {
+        id: ev.id || idx,
+        minute: ev.clock?.displayValue || ev.time?.displayValue || "",
+
+        typeText: isSubstitution
+          ? "Substitution"
+          : isGoal
+            ? "Goal"
+            : typeText || text,
+
+        teamId: ev.team?.id || null,
+
+        player,
+
+        playerIn,
+        playerOut,
+
+        isSubstitution,
+        isGoal,
+      };
+    })
+  .filter(Boolean);
 
   const lineups = (data.rosters || []).map((teamRoster) => {
     const roster = teamRoster.roster || teamRoster.athletes || [];
     const teamId = teamRoster.team?.id;
 
-    const subsWhoEntered = new Set(
-      events
-        .filter((ev) => ev.isSubstitution && String(ev.teamId) === String(teamId) && ev.subInPlayer)
-        .map((ev) => ev.subInPlayer)
-    );
+    const subsWhoEntered = new Set();
 
     const mapPlayer = (p) => ({
       id: p.athlete?.id,
@@ -126,9 +194,11 @@ export async function getFixtureDetail(leagueCode, id) {
       teamName: teamRoster.team?.displayName,
       teamLogo: teamLogo(teamRoster.team),
       formation: teamRoster.formation?.name,
+
       starters: roster
         .filter((p) => p.starter === true || p.formationPlace)
         .map(mapPlayer),
+
       substitutes: roster
         .filter((p) => p.starter !== true && !p.formationPlace)
         .map(mapPlayer),
@@ -139,7 +209,9 @@ export async function getFixtureDetail(leagueCode, id) {
 }
 
 export async function getStandings(leagueCode) {
-  const { data } = await axios.get(`${STANDINGS_URL}/${leagueCode}/standings`);
+  const { data } = await axios.get(
+    `${STANDINGS_URL}/${leagueCode}/standings`
+  );
 
   const groups = data.children?.length
     ? data.children
@@ -147,13 +219,16 @@ export async function getStandings(leagueCode) {
       ? [{ standings: data.standings }]
       : [];
 
-  const entries = groups.flatMap((g) => g.standings?.entries || []);
+  const entries = groups.flatMap(
+    (g) => g.standings?.entries || []
+  );
 
-  return entries.map((entry, idx) => {
+  const standings = entries.map((entry, idx) => {
     const statByName = (names) => {
       const stat = entry.stats?.find((s) =>
         names.includes((s.name || "").toLowerCase())
       );
+
       return stat ? Number(stat.value) : null;
     };
 
@@ -166,8 +241,18 @@ export async function getStandings(leagueCode) {
       win: statByName(["wins"]),
       draw: statByName(["ties", "draws"]),
       lose: statByName(["losses"]),
-      goalsDiff: statByName(["pointdifferential", "goaldifferential"]),
+      goalsDiff: statByName([
+        "pointdifferential",
+        "goaldifferential",
+      ]),
       points: statByName(["points"]),
     };
   });
+
+  return standings
+    .sort((a, b) => a.rank - b.rank)
+    .map((entry, index) => ({
+      ...entry,
+      rank: index + 1,
+    }));
 }

@@ -511,3 +511,44 @@
 .md-stPoints { font-weight: 800; color: #0f172a; }
 .md-positive { color: #16a34a; }
 .md-negative { color: #ef4444; }
+
+.md-teamFavoriteBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 34px;
+  height: 34px;
+
+  margin-left: 8px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+
+  background: #fff;
+  color: #9ca3af;
+
+  font-size: 21px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.md-teamFavoriteBtn:hover {
+  transform: scale(1.08);
+  color: #ef4444;
+  border-color: #fecaca;
+  background: #fff5f5;
+}
+
+.md-teamFavoriteBtn--active {
+  color: #ef4444;
+  border-color: #fecaca;
+  background: #fff1f2;
+}

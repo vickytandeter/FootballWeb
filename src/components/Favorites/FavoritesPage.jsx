@@ -1,34 +1,100 @@
 import { useState } from "react";
-import { getFavorites, removeFavorite } from "../../services/storage";
-import MatchList from "../Home/MatchList";
+import {
+  getFavoriteTeams,
+  removeFavoriteTeam,
+} from "../../services/storage";
 import "../estilo/FavoritesPage.css";
 
 const FavoritesPage = () => {
-  const [favorites, setFavorites] = useState(getFavorites);
+  const [favoriteTeams, setFavoriteTeams] = useState(
+    getFavoriteTeams()
+  );
 
-  const handleRemoveFavorite = (fixture) => {
-    const updated = removeFavorite(fixture.id);
-    setFavorites([...updated]);
+  const handleRemoveTeam = (teamId) => {
+    const updated = removeFavoriteTeam(teamId);
+    setFavoriteTeams([...updated]);
   };
 
   return (
     <div className="favorites-page">
+
       <section className="favorites-header">
-        <h1 className="favorites-header__title">❤️ Mis Favoritos</h1>
+        <h1 className="favorites-header__title">
+          ❤️ Mis Equipos
+        </h1>
+
         <p className="favorites-header__subtitle">
-          {favorites.length === 0
-            ? "Aún no agregaste partidos a favoritos."
-            : `Tenés ${favorites.length} ${favorites.length === 1 ? "partido guardado" : "partidos guardados"}.`}
+          {favoriteTeams.length === 0
+            ? "Aún no agregaste equipos a favoritos."
+            : `Tenés ${favoriteTeams.length} ${
+                favoriteTeams.length === 1
+                  ? "equipo guardado"
+                  : "equipos guardados"
+              }.`}
         </p>
       </section>
 
-      <MatchList
-        fixtures={favorites}
-        favorites={favorites}
-        onToggleFavorite={handleRemoveFavorite}
-        showRemoveButton={true}
-        emptyMessage="Aún no agregaste partidos a favoritos. Volvé al inicio y hacé clic en 'Agregar a favoritos'."
-      />
+      {favoriteTeams.length === 0 ? (
+        <div className="favorites-empty">
+          <p>
+            Aún no agregaste equipos a favoritos.
+          </p>
+
+          <p>
+            Entrá al detalle de un partido y tocá
+            el corazón junto al equipo que quieras guardar.
+          </p>
+        </div>
+      ) : (
+        <div className="favoriteTeams-grid">
+
+          {favoriteTeams.map((team) => (
+            <article
+              key={team.id}
+              className="favoriteTeam-card"
+            >
+
+              <div className="favoriteTeam-logoWrapper">
+                {team.logo ? (
+                  <img
+                    src={team.logo}
+                    alt={team.name}
+                    className="favoriteTeam-logo"
+                  />
+                ) : (
+                  <div className="favoriteTeam-noLogo">
+                    ⚽
+                  </div>
+                )}
+              </div>
+
+              <div className="favoriteTeam-info">
+                <h2 className="favoriteTeam-name">
+                  {team.name}
+                </h2>
+
+                <span className="favoriteTeam-league">
+                  {team.league}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="favoriteTeam-remove"
+                onClick={() =>
+                  handleRemoveTeam(team.id)
+                }
+                title="Quitar de favoritos"
+              >
+                ×
+              </button>
+
+            </article>
+          ))}
+
+        </div>
+      )}
+
     </div>
   );
 };

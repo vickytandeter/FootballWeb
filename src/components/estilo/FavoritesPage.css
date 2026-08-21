@@ -21,3 +21,103 @@
   font-size: 1rem;
   color: #64748b;
 }
+
+.favoriteTeams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.favoriteTeam-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.favoriteTeam-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.09);
+}
+
+.favoriteTeam-logoWrapper {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favoriteTeam-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.favoriteTeam-noLogo {
+  font-size: 32px;
+}
+
+.favoriteTeam-info {
+  min-width: 0;
+  padding-right: 24px;
+}
+
+.favoriteTeam-name {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.favoriteTeam-league {
+  display: block;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.favoriteTeam-remove {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f3f4f6;
+  color: #6b7280;
+
+  font-size: 20px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.favoriteTeam-remove:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.favorites-empty {
+  margin-top: 30px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #6b7280;
+}

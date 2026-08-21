@@ -75,7 +75,7 @@ const MatchCard = ({ fixture, isFav, onToggleFavorite, showRemoveButton }) => {
 
       <div className="match-card__footer">
         <span className="match-card__date">{formatDate(fixture.date)}</span>
-        {onToggleFavorite && (
+        {/* {onToggleFavorite && (
           <button
             className={`match-card__fav-btn ${isFav ? "match-card__fav-btn--active" : ""}`}
             onClick={(e) => {
@@ -87,7 +87,7 @@ const MatchCard = ({ fixture, isFav, onToggleFavorite, showRemoveButton }) => {
             {isFav ? "❤️" : "🤍"}{" "}
             {showRemoveButton ? "Quitar de favoritos" : "Agregar a favoritos"}
           </button>
-        )}
+        )} */}
       </div>
     </div>
   );

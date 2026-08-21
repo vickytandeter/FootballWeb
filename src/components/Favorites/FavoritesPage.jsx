@@ -7,8 +7,7 @@ const FavoritesPage = () => {
   const [favorites, setFavorites] = useState(getFavorites);
 
   const handleRemoveFavorite = (fixture) => {
-    const { id } = fixture.fixture;
-    const updated = removeFavorite(id);
+    const updated = removeFavorite(fixture.id);
     setFavorites([...updated]);
   };
 

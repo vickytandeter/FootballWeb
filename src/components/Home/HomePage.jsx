@@ -3,6 +3,7 @@ import { getLiveFixtures } from "../../services/api";
 import { getFavorites, addFavorite, removeFavorite } from "../../services/storage";
 import SearchBar from "./SearchBar";
 import MatchList from "./MatchList";
+import WeekMatches from "./WeekMatches";
 import "../estilo/HomePage.css";
 
 const HomePage = () => {
@@ -37,11 +38,10 @@ const HomePage = () => {
   };
 
   const handleToggleFavorite = (fixture) => {
-    const { id } = fixture.fixture;
-    const isFav = favorites.some((f) => f.fixtureId === id);
+    const isFav = favorites.some((f) => f.id === fixture.id);
 
     if (isFav) {
-      const updated = removeFavorite(id);
+      const updated = removeFavorite(fixture.id);
       setFavorites([...updated]);
     } else {
       const updated = addFavorite(fixture);
@@ -49,16 +49,16 @@ const HomePage = () => {
     }
   };
 
+  const favoriteIds = favorites.map((f) => f.id);
+
   const filteredFixtures = fixtures.filter((fixture) => {
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
-    const { home, away } = fixture.teams;
-    const { name, country } = fixture.league;
+    const { home, away, league } = fixture;
     return (
-      home.name.toLowerCase().includes(query) ||
-      away.name.toLowerCase().includes(query) ||
-      name.toLowerCase().includes(query) ||
-      (country && country.toLowerCase().includes(query))
+      home.name?.toLowerCase().includes(query) ||
+      away.name?.toLowerCase().includes(query) ||
+      league?.toLowerCase().includes(query)
     );
   });
 
@@ -98,6 +98,15 @@ const HomePage = () => {
           }
         />
       </section>
+
+      {!searchQuery && (
+        <section className="home-week" style={{ marginTop: 40 }}>
+          <WeekMatches
+            favoriteIds={favoriteIds}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        </section>
+      )}
     </div>
   );
 };

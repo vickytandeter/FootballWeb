@@ -40,12 +40,11 @@ const MatchList = ({
   return (
     <div className="match-list">
       {fixtures.map((fixture) => {
-        const fixtureId = fixture.fixture.id;
-        const isFav = favorites.some((f) => f.fixtureId === fixtureId);
+        const isFav = favorites.some((f) => f.id === fixture.id);
 
         return (
           <MatchCard
-            key={fixtureId}
+            key={fixture.id}
             fixture={fixture}
             isFav={isFav}
             onToggleFavorite={onToggleFavorite}

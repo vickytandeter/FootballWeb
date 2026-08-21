@@ -1,4 +1,4 @@
-const STORAGE_KEY = "football_hub_favorites";
+const STORAGE_KEY = "football_hub_favorites_espn";
 
 export const getFavorites = () => {
   try {
@@ -13,34 +13,22 @@ export const saveFavorites = (favorites) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
 };
 
-export const addFavorite = (fixture) => {
+export const addFavorite = (match) => {
   const favorites = getFavorites();
-  const exists = favorites.some((f) => f.fixtureId === fixture.fixture.id);
-  if (exists) return;
-  const { id, date, status, referee } = fixture.fixture;
-  const { name, logo, country } = fixture.league;
-  const newFav = {
-    fixtureId: id,
-    date,
-    status,
-    referee,
-    league: { name, logo, country },
-    homeTeam: { ...fixture.teams.home },
-    awayTeam: { ...fixture.teams.away },
-    goals: { ...fixture.goals },
-  };
-  const newFavorites = [...favorites, newFav];
+  const exists = favorites.some((f) => f.id === match.id);
+  if (exists) return favorites;
+  const newFavorites = [...favorites, { ...match, savedAt: Date.now() }];
   saveFavorites(newFavorites);
   return newFavorites;
 };
 
-export const removeFavorite = (fixtureId) => {
+export const removeFavorite = (matchId) => {
   const favorites = getFavorites();
-  const newFavorites = favorites.filter((f) => f.fixtureId !== fixtureId);
+  const newFavorites = favorites.filter((f) => f.id !== matchId);
   saveFavorites(newFavorites);
   return newFavorites;
 };
 
-export const isFavorite = (fixtureId) => {
-  return getFavorites().some((f) => f.fixtureId === fixtureId);
+export const isFavorite = (matchId) => {
+  return getFavorites().some((f) => f.id === matchId);
 };
